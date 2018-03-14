@@ -9,7 +9,7 @@ let options = {
     {
       endpoint: '/roles',
       collection: 'roles',
-      verbs: ['POST', 'GET', 'PUT', 'PATCH', 'DELETEx'], // default all
+      verbs: ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'], // default all
     }
   ]
 }
