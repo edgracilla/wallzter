@@ -27,7 +27,10 @@
     "gulp-standard": "^10.1.2"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "bluebird": "^3.5.1",
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "mongoose": "^5.0.10",
+    "supertest": "^3.0.0"
   }
 }

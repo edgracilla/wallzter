@@ -10,6 +10,7 @@ let options = {
       endpoint: '/roles',
       collection: 'roles',
       verbs: ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'], // default all
+      rules: {}
     }
   ]
 }

@@ -1,6 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
+const mongoose = require('mongoose')
 
 const Runner = require('./lib/runner')
 
@@ -13,8 +14,10 @@ module.exports.test = (options) => {
         errors.map(err => {
           console.log(err)
         })
+
+        return Promise.resolve()
       }
 
-      // return runner.run()
+      return runner.run()
     })
 }
