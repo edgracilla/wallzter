@@ -1,22 +1,24 @@
 'use strict'
 
+const PATHS = {
+  js: ['*.js', '*/*.js', '*/**/*.js', '!node_modules/**', '!gulpfile.js'],
+  json: ['*.json', '*/*.json', '*/**/*.json', '!node_modules/**'],
+}
+
+const del = require('del')
 const gulp = require('gulp')
 const env = require('gulp-env')
 const mocha = require('gulp-mocha')
 const jshint = require('gulp-jshint')
-const plumber = require('gulp-plumber')
 const nodemon = require('gulp-nodemon')
-const standard = require('gulp-standard')
+const sequence = require('gulp-sequence')
+const plumber = require('gulp-plumber')
+const obfuscate = require('gulp-javascript-obfuscator')
 const jsonlint = require('gulp-json-lint')
-
-let paths = {
-  js: ['*.js', '*/*.js', '*/**/*.js', '!node_modules/**', '!gulpfile.js'],
-  json: ['*.json', '*/*.json', '*/**/*.json', '!node_modules/**'],
-  tests: ['./tests/builder/*.js', './tests/halter/*.js']
-}
+const standard = require('gulp-standard')
 
 gulp.task('js-lint', function () {
-  return gulp.src(paths.js)
+  return gulp.src(PATHS.js)
     .pipe(plumber())
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
@@ -24,56 +26,41 @@ gulp.task('js-lint', function () {
 })
 
 gulp.task('json-lint', function () {
-  return gulp.src(paths.json)
+  return gulp.src(PATHS.json)
     .pipe(plumber())
-    .pipe(jsonlint({comments: true}))
+    .pipe(jsonlint({
+      comments: true
+    }))
     .pipe(jsonlint.report())
 })
 
 gulp.task('standard', function () {
-  return gulp.src(paths.js)
+  return gulp.src(PATHS.js)
+    .pipe(plumber())
     .pipe(standard())
     .pipe(standard.reporter('default', {
-      showRuleNames: true,
-      showFilePath: true,
       breakOnError: true,
       quiet: true
     }))
 })
 
-gulp.task('run-tests', function () {
-  return gulp
-    .src(paths.tests, {
-      read: false
-    })
-    .pipe(mocha({
-      reporter: 'list'
-    }))
-    .once('error', function (error) {
-      console.error(error)
-      process.exit(1)
-    })
-    .once('end', function () {
-      process.exit()
-    })
-})
+gulp.task('wall-test', function () {
+  require('dotenv').config()
 
-let runApp = function (nodeEnv = 'development') {
   env({
     vars: {
-      NODE_ENV: nodeEnv
+      NODE_ENV: 'wall-test'
     }
   })
 
-  nodemon({
-    ext: 'js',
-    watch: paths.js,
-    restartable: 'rs',
-    script: 'index.js',
-    ignore: ['node_modules', '.idea', '.git', '.gitignore', '.jshintrc']
-  })
-}
+  return gulp.src(['mock/wall.test.js'])
+    .pipe(plumber())
+    .pipe(mocha({
+      reporter: 'spec',
+      exit: true
+    }))
+})
 
 gulp.task('lint', ['js-lint', 'json-lint', 'standard'])
-gulp.task('test', ['lint', 'run-tests'])
-gulp.task('run', () => runApp())
+gulp.task('wallzt', ['wall-test'])
+gulp.task('default', ['wallzt'])
